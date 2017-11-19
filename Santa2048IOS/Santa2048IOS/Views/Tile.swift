@@ -12,8 +12,8 @@ class Tile: UIView {
     var delegate: AppearanceProtocol
     var value: Int = 0 {
         didSet {
-            backgroundColor = delegate.tileColor(value)
-            numberLabel = delegate.numberColor(value)
+            backgroundColor = delegate.tileColor(value: value)
+            numberLabel = delegate.numberColor(value: value)
             numberLabel.text = "\(value)"
         }
     }
@@ -24,12 +24,20 @@ class Tile: UIView {
     }
     init(position: CGPoint, width: CGFloat, value: Int, radius: CGFloat,
          delegate d: AppearanceProtocol) {
+        
+        delegate = d
+        numberLabel = UILabel(frame: CGRect(origin: CGPoint(x: 0,y: 0), size: CGSize(width: width, height: width)))
+        numberLabel.textAlignment = NSTextAlignment.center
+        numberLabel.minimumScaleFactor = 0.5
+        numberLabel.font = delegate.fontForNumbers()
+        
+        super.init(frame: CGRect(origin: CGPoint(x: 0,y: 0), size: CGSize(width: width, height: width)))
         addSubview(numberLabel)
         layer.cornerRadius = radius
         
         self.value = value
-        backgroundColor = delegate.tileColor(value)
-        numberLabel.textColor = delegate.numberColor(value)
+        backgroundColor = delegate.tileColor(value: value)
+        numberLabel.textColor = delegate.numberColor(value: value)
         numberLabel.text = "\(value)"
     }
 }
