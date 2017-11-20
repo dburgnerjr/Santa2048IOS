@@ -21,7 +21,7 @@ class ScoreView : UIView, ScoreViewProtocol {
     let defaultFrame = CGRect(origin: .zero, size: CGSize(width: 140, height: 140))
     var label: UILabel
     
-    init(backgroundColoe bgcolor: UIColor, textColor tcolor:
+    init(backgroundColor bgcolor: UIColor, textColor tcolor:
         UIColor, font: UIFont, radius r: CGFloat) {
         label = UILabel(frame: defaultFrame)
         label.textAlignment = NSTextAlignment.center

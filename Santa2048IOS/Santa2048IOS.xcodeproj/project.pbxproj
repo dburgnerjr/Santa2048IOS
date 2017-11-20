@@ -19,6 +19,7 @@
 		233F71E21FB94A5B00CA42C2 /* Accessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F71E11FB94A5B00CA42C2 /* Accessory.swift */; };
 		233F71E41FB94A9C00CA42C2 /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F71E31FB94A9C00CA42C2 /* GameModel.swift */; };
 		233F71E61FB94AAE00CA42C2 /* AuxModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233F71E51FB94AAD00CA42C2 /* AuxModel.swift */; };
+		23C827F41FC2117600C658AB /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23C827F31FC2117600C658AB /* GameViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		233F71E11FB94A5B00CA42C2 /* Accessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accessory.swift; sourceTree = "<group>"; };
 		233F71E31FB94A9C00CA42C2 /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
 		233F71E51FB94AAD00CA42C2 /* AuxModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuxModel.swift; sourceTree = "<group>"; };
+		23C827F31FC2117600C658AB /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 				233F71C91FB946CE00CA42C2 /* ViewController.swift */,
 				233F71CE1FB946CE00CA42C2 /* Assets.xcassets */,
 				233F71D01FB946CE00CA42C2 /* LaunchScreen.storyboard */,
+				23C827F31FC2117600C658AB /* GameViewController.swift */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				23C827F41FC2117600C658AB /* GameViewController.swift in Sources */,
 				233F71CA1FB946CE00CA42C2 /* ViewController.swift in Sources */,
 				233F71E21FB94A5B00CA42C2 /* Accessory.swift in Sources */,
 				233F71DA1FB949BC00CA42C2 /* Game.swift in Sources */,
