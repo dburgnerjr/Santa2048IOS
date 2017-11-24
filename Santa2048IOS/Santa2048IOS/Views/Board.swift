@@ -69,7 +69,7 @@ class Board : UIView {
                 let background = UIView(frame: CGRect(x: xCursor, y: yCursor, width: tileWidth, height: tileWidth))
                 background.layer.cornerRadius = bgRadius
                 background.backgroundColor = tileColor
-                addSubView(background)
+                addSubview(background)
                 yCursor += tilePadding + tileWidth
             }
             xCursor += tilePadding + tileWidth
@@ -85,12 +85,12 @@ class Board : UIView {
         let tile = Tile(position: CGPoint(x: x, y: y), width: tileWidth, value: value, radius: r, delegate: provider)
         tile.layer.setAffineTransform(CGAffineTransform(scaleX: tilePopStartScale, y: tilePopStartScale))
         
-        addSubView(tile)
+        addSubview(tile)
         bringSubview(toFront: tile)
-        tiles[NSIndex(forRow: row, inSection: col)] = tile
+        tiles[NSIndexPath(row: row, section: col)] = tile
         
         UIView.animate(withDuration: tileExpandTime, delay: tilePopDelay, options: [], animations: { () -> Void in
-                tile.layer.setAffineTransform(CGAffineTransform(scaleX: self.tilePopStartScale, y: self.tilePopStartScale))
+                tile.layer.setAffineTransform(CGAffineTransform(scaleX: self.tilePopMaxScale, y: self.tilePopMaxScale))
         },
         completion: { (finished: Bool) -> Void in
             UIView.animate(withDuration: self.tileContractTime, animations: { () -> Void in
@@ -144,8 +144,8 @@ class Board : UIView {
         })
     }
     
-    func moveTwoTiles(from: ((Int, Int), (Int, Int)), to: (Int, Int), value: Int) {
-        assert(positionIsValid(pos: (from.0) && positionIsValid(pos: (from.1) && positionIsValid(pos: to))
+    func moveTwoTile(from: ((Int, Int), (Int, Int)), to: (Int, Int), value: Int) {
+        assert(positionIsValid(pos: (from.0)) && positionIsValid(pos: (from.1)) && positionIsValid(pos: to))
         let (fromRowA, fromColA) = from.0
         let (fromRowB, fromColB) = from.1
         let (toRow, toCol) = to
@@ -195,34 +195,3 @@ class Board : UIView {
         })
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

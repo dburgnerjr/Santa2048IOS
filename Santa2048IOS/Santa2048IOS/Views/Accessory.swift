@@ -18,7 +18,7 @@ class ScoreView : UIView, ScoreViewProtocol {
             label.text = "SCORE: \(score)"
         }
     }
-    let defaultFrame = CGRect(origin: .zero, size: CGSize(width: 140, height: 140))
+    let defaultFrame = CGRect(origin: .zero, size: CGSize(width: 140, height: 40))
     var label: UILabel
     
     init(backgroundColor bgcolor: UIColor, textColor tcolor:
@@ -40,6 +40,6 @@ class ScoreView : UIView, ScoreViewProtocol {
     }
     
     func scoreChanged(newScore s: Int) {
-        let defaultFrame = CGRect(origin: .zero, size: CGSize(width: 140, height: 140))
+        score = s
     }
 }

@@ -13,7 +13,7 @@ class Tile: UIView {
     var value: Int = 0 {
         didSet {
             backgroundColor = delegate.tileColor(value: value)
-            numberLabel = delegate.numberColor(value: value)
+            numberLabel.textColor = delegate.numberColor(value: value)
             numberLabel.text = "\(value)"
         }
     }

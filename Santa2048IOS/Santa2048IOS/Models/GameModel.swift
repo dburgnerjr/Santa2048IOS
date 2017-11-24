@@ -21,7 +21,7 @@ class GameModel: NSObject {
     
     var score: Int = 0 {
         didSet {
-            delegate.scoreChanged(score)
+            delegate.scoreChange(score: score)
         }
     }
     var gameboard: SquareGameboard<TileObject>
@@ -29,7 +29,7 @@ class GameModel: NSObject {
     let delegate: GameModelProtocol
     
     var queue: [MoveCommand]
-    var timer: NSTimer
+    var timer: Timer
 
     let maxCommands = 100
     let queueDelay = 0.3
@@ -39,31 +39,31 @@ class GameModel: NSObject {
         threshold = t
         self.delegate = delegate
         queue = [MoveCommand]()
-        timer = NSTimer()
+        timer = Timer()
         gameboard = SquareGameboard(dimension: d, initialValue: .Empty)
         super.init()
     }
     
     func reset() {
         score = 0
-        gameboard.setAll(.Empty)
-        queue.removeAll(keepCapacity: true)
+        gameboard.setAll(item: .Empty)
+        queue.removeAll(keepingCapacity: true)
         timer.invalidate()
     }
     
-    func queueMove(direction: MoveDirection, completion: (Bool) -> ()) {
+    func queueMove(direction: MoveDirection, completion: @escaping (Bool) -> ()) {
         if queue.count > maxCommands {
             return
         }
 
         let command = MoveCommand(d: direction, c: completion)
         queue.append(command)
-        if (!timer.valid) {
-            timerFired(timer)
+        if (!timer.isValid) {
+            timerFired(timer: timer)
         }
     }
     
-    func timerFired(timer: NSTimer) {
+    func timerFired(timer: Timer) {
         if queue.count == 0 {
             return
         }
@@ -71,15 +71,14 @@ class GameModel: NSObject {
         var changed = false
         while queue.count > 0 {
             let command = queue[0]
-            queue.removeAtIndex(0)
-            changed = preformMove(command.direction)
+            queue.remove(at: 0)
+            changed = performMove(direction: command.direction)
             command.completion(changed)
             if (changed) {
                 break
             }
             if changed {
-                self.timer = NSTimer.scheduledTimerWithTimeInterval
-                (queueDelay, target: self, selector: Selector("timerFired:"),
+                self.timer = Timer.scheduledTimer(timeInterval: queueDelay, target: self, selector: Selector(("timerFired:")),
                  userInfo: nil, repeats: false)
             }
         }
@@ -90,7 +89,7 @@ class GameModel: NSObject {
         switch gameboard[x, y] {
             case .Empty:
                 gameboard[x, y] = TileObject.Tile(value)
-                delegate.insertTile(pos, value: value)
+                delegate.insertTile(location: pos, value: value)
             case .Tile:
                 break
         }
@@ -105,7 +104,7 @@ class GameModel: NSObject {
         // Randomly select an open spot, and put a new tile there
         let idx = Int(arc4random_uniform(UInt32(openSpots.count-1)))
         let (x, y) = openSpots[idx]
-        insertTile((x, y), value: value)
+        insertTile(pos: (x, y), value: value)
     }
     
     func gameboardEmptySpots() -> [(Int, Int)] {
@@ -120,6 +119,7 @@ class GameModel: NSObject {
                 }
             }
         }
+        return buffer
     }
     
     func gameboardFull() -> Bool {
@@ -133,7 +133,7 @@ class GameModel: NSObject {
         }
         switch gameboard[x, y + 1] {
             case let .Tile(v):
-                return v = value
+                return v == value
             default:
                 return false
         }
@@ -146,7 +146,7 @@ class GameModel: NSObject {
         }
         switch gameboard[x + 1, y] {
             case let .Tile(v):
-                return v = value
+                return v == value
             default:
                 return false
         }
@@ -191,7 +191,7 @@ class GameModel: NSObject {
     
     func performMove(direction: MoveDirection) -> Bool {
         let coordinateGenerator: (Int) -> [(Int, Int)] = { (iteration: Int) -> [(Int, Int)] in
-            var buffer = Array<(Int, Int)>(count: self.dimension, repeatedValue: (0, 0))
+            var buffer = Array<(Int, Int)>(repeating: (0, 0), count: self.dimension)
             for i in 0..<self.dimension {
                 switch direction {
                     case .Up:
@@ -209,13 +209,13 @@ class GameModel: NSObject {
         
         var atLeastOneMove = false
         for i in 0..<dimension {
-            let coords = coordinateGenerator
+            let coords = coordinateGenerator(i)
             
             let tiles = coords.map() { (c: (Int, Int)) -> TileObject in
                 let (x, y) = c
                 return self.gameboard[x, y]
             }
-            let orders = merge(tiles)
+            let orders = merge(group: tiles)
             atLeastOneMove = orders.count > 0 ? true : atLeastOneMove
             
             // write back the results
@@ -230,7 +230,7 @@ class GameModel: NSObject {
                         }
                         gameboard[sx, sy] = TileObject.Empty
                         gameboard[dx, dy] = TileObject.Tile(v)
-                        delegate.moveOneTile(coords[s], to: coords[d], value: v)
+                        delegate.moveOneTile(from: coords[s], to: coords[d], value: v)
                     case let MoveOrder.DoubleMoveOrder(s1, s2, d, v):
                         // Perform a simultaneous two-tile move
                         let (s1x, s1y) = coords[s1]
@@ -240,7 +240,7 @@ class GameModel: NSObject {
                         gameboard[s1x, s1y] = TileObject.Empty
                         gameboard[s2x, s2y] = TileObject.Empty
                         gameboard[dx, dy] = TileObject.Tile(v)
-                        delegate.moveTwoTiles((coords[s1], coords[s2]), to: coords[d], value: v)
+                        delegate.moveTwoTile(from: (coords[s1], coords[s2]), to: coords[d], value: v)
                 }
             }
         }
@@ -249,7 +249,7 @@ class GameModel: NSObject {
     
     func condense(group: [TileObject]) -> [ActionToken] {
         var tokenBuffer = [ActionToken]()
-        for (idx, tile) in enumerate(group) {
+        for (idx, tile) in group.enumerated() {
             switch tile {
                 case let .Tile(value) where tokenBuffer.count == idx:
                     tokenBuffer.append(ActionToken.NoAction(source: idx, value: value))
@@ -269,7 +269,7 @@ class GameModel: NSObject {
     func collapse(group: [ActionToken]) -> [ActionToken] {
         var tokenBuffer = [ActionToken]()
         var skipNext = false
-        for (idx, token) in enumerate(group) {
+        for (idx, token) in group.enumerated() {
             if skipNext {
                 skipNext = false
                 continue
@@ -307,7 +307,7 @@ class GameModel: NSObject {
     
     func convert(group: [ActionToken]) -> [MoveOrder] {
         var moveBuffer = [MoveOrder]()
-        for (idx, t) in enumerate(group) {
+        for (idx, t) in group.enumerated() {
             switch t {
                 case let .Move(s, v):
                     moveBuffer.append(MoveOrder.SingleMoveOrder(source: s, destination: idx, value: v, wasMerge: false))
@@ -323,7 +323,7 @@ class GameModel: NSObject {
     }
     
     func merge(group: [TileObject]) -> [MoveOrder] {
-        return convert(collapse(condense(group)))
+        return convert(group: collapse(group: condense(group: group)))
     }
 }
 
